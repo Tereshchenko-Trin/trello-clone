@@ -4,13 +4,148 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>trello</title>
+	<title>Trello</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap"
+		rel="stylesheet">
 	<link rel="stylesheet" href="./scss/app.scss">
 	<script type="module" src="./js/app.js"></script>
 </head>
 
-<body>
-	<button class="btn btn-primary">click</button>
+<body class="vh-100">
+	<header class="header container-fluid">
+		<div class="header__container container">
+			<div class="header__logo">
+				<img src="./img/logo-icon.svg" alt="logo" class="img-fluid">
+			</div>
+			<form class="header__input-container">
+				<input class="header__search-input form-control" type="search" placeholder="Search">
+				<button class="header__button btn btn-outline-primary" type="submit">Search</button>
+			</form>
+		</div>
+	</header>
+
+	<main>
+		<section class="boards bg-body-secondary">
+			<div class="boards__container container">
+				<div class="boards__title-container">
+					<H1 class="boards__title">Progect board</H1>
+					<div class="clock-container">
+						<p class="clock">22:00</p>
+					</div>
+					<button type="button" class="boards__button button btn btn-primary">Add Task</button>
+				</div>
+
+				<div class="boards__workspace-container">
+					<div class="board board__planned">
+						<div class="board__title-container">
+							<h2 class="board__title">Planned</h2>
+							<p class="board__task-count">0 tasks</p>
+						</div>
+						<div id="tasksPlanned" class="board__tasks-container">
+							<div class="task">
+								<div class="task__info-container">
+									<div class="task__title">
+										<p>Title</p>
+									</div>
+									<div class="task__description">
+										<p>Lorem ipsum dolor sit amet.</p>
+									</div>
+									<div class="task__date">
+										<p>Date</p>
+									</div>
+									<div class="task__user">
+										<p>User</p>
+									</div>
+								</div>
+								<div class="task__buttons-container">
+									<select class="task__form-select form-select">
+										<option value="1">Low</option>
+										<option value="2">Medium</option>
+										<option value="3">High</option>
+									</select>
+									<button type="task__button button" class="btn btn-outline-primary">Edit</button>
+									<button type="task__button button" class="btn btn-outline-danger"><i
+											class="bi bi-trash3"></i></button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="board board__in-progress">
+						<div class="board__title-container">
+							<h2 class="board__title">In Progress</h2>
+							<p class="board__task-count">0 tasks</p>
+						</div>
+						<div id="tasksInProgress" class="board__tasks-container">
+							<div class="task">
+								<div class="task__info-container">
+									<div class="task__title">
+										<p>Title</p>
+									</div>
+									<div class="task__description">
+										<p>Lorem ipsum dolor sit amet.</p>
+									</div>
+									<div class="task__date">
+										<p>Date</p>
+									</div>
+									<div class="task__user">
+										<p>User</p>
+									</div>
+								</div>
+								<div class="task__buttons-container">
+									<select class="task__form-select form-select">
+										<option value="1">Low</option>
+										<option value="2">Medium</option>
+										<option value="3">High</option>
+									</select>
+									<button type="task__button button" class="btn btn-outline-primary">Edit</button>
+									<button type="task__button button" class="btn btn-outline-danger"><i
+											class="bi bi-trash3"></i></button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="board board__completed">
+						<div class="board__title-container">
+							<h2 class="board__title">Completed</h2>
+							<p class="board__task-count">0 tasks</p>
+						</div>
+						<div id="tasksCompleted" class="board__tasks-container">
+							<div class="task">
+								<div class="task__info-container">
+									<div class="task__title">
+										<p>Title</p>
+									</div>
+									<div class="task__description">
+										<p>Lorem ipsum dolor sit amet.</p>
+									</div>
+									<div class="task__date">
+										<p>Date</p>
+									</div>
+									<div class="task__user">
+										<p>User</p>
+									</div>
+								</div>
+								<div class="task__buttons-container">
+									<select class="task__form-select form-select">
+										<option value="1">Low</option>
+										<option value="2">Medium</option>
+										<option value="3">High</option>
+									</select>
+									<button type="task__button button" class="btn btn-outline-primary">Edit</button>
+									<button type="task__button button" class="btn btn-outline-danger"><i
+											class="bi bi-trash3"></i></button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
 </body>
 
 </html>

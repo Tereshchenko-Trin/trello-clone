@@ -1,2 +1,159 @@
 // Vendors
-@import '~bootstrap/scss/bootstrap'
+@import '~bootstrap/scss/bootstrap';
+@import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css');
+
+// Style
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: 'Nunito', sans-serif;
+}
+
+p,
+h2 {
+	margin: 0;
+}
+
+.clock {
+	font-size: 1.5rem;
+	font-weight: 500;
+}
+
+.header {
+	padding: 1.25rem 0;
+	border-bottom: 1px solid $gray-200;
+	background-color: $white;
+
+	&__container {
+		display: flex;
+		justify-content: space-between;
+		gap: 1.25rem;
+	}
+
+	&__logo {
+		max-width: 8rem;
+		width: 100%;
+	}
+
+	&__input-container {
+		max-width: 20rem;
+		width: 100%;
+		display: flex;
+		gap: 1rem;
+	}
+
+	&__search-input,
+	&__button {
+		border-radius: 50px;
+	}
+}
+
+.button {
+	border-radius: 50px;
+}
+
+.boards {
+	padding: 1.25rem 0;
+	height: calc(100vh - 5.5625rem);
+
+	&__title-container {
+		margin-bottom: 1.25rem;
+		display: flex;
+		justify-content: space-between;
+	}
+
+	&__title {
+		font-size: 1.875rem;
+	}
+
+	&__workspace-container {
+		display: flex;
+		justify-content: space-between;
+		gap: 1.25rem;
+	}
+
+	&__button {
+		max-width: 10rem;
+		width: 100%;
+	}
+}
+
+.board {
+	max-width: 25rem;
+	width: 100%;
+	padding: 1.25rem;
+	border-radius: 10px;
+	background-color: $white;
+
+	&__title-container {
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: 1.25rem;
+	}
+
+	&__title {
+		font-size: 1.5rem;
+	}
+
+	&__task-count {
+		align-self: end;
+	}
+
+	&__tasks-container {
+		border: 1px, solid, $gray-300;
+		border-radius: 10px;
+		padding: 0.625rem;
+	}
+
+}
+
+.task {
+	&__info-container {
+		display: flex;
+		flex-direction: column;
+		gap: 0.625rem;
+		margin-bottom: 1rem;
+	}
+
+	&__title {}
+
+	&__description {
+		font-size: 0.875rem;
+		color: $gray-600;
+	}
+
+	&__date,
+	&__user {
+		font-size: 0.875rem;
+	}
+
+	&__buttons-container {
+		display: flex;
+		justify-content: space-between;
+		gap: 0.625rem;
+	}
+}
+
+// Media
+@media all and (max-width: 1200px) {}
+
+@media (max-width: 992px) {
+	html {
+		font-size: 14px;
+	}
+}
+
+@media (max-width: 768px) {
+	html {
+		font-size: 12px;
+	}
+}
+
+@media (max-width: 576px) {}
+
+@media (max-width: 420px) {
+	html {
+		font-size: 10px;
+	}
+}
