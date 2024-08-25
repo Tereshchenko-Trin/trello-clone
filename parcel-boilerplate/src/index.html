@@ -29,10 +29,11 @@
 	<main>
 		<section class="boards bg-body-secondary">
 			<div class="boards__container container">
-				<div class="boards__title-container">
-					<H1 class="boards__title">Progect board</H1>
+				<div class="boards__header-container">
+					<h1 class="boards__title">Progect board</h1>
 					<div id="clock" class="clock clock-container"></div>
-					<button type="button" class="boards__button button btn btn-primary">Add Task</button>
+					<button type="button" class="boards__button button btn btn-primary" data-bs-toggle="modal"
+						data-bs-target="#addTaskModal">Create Task</button>
 				</div>
 
 				<div class="boards__workspace-container">
@@ -41,8 +42,8 @@
 							<h2 class="board__title">Planned</h2>
 							<p class="board__task-count">0 tasks</p>
 						</div>
-						<div id="tasksPlanned" class="board__tasks-container">
-							<div class="task">
+						<div id="boardPlanned" class="board__tasks-container">
+							<!-- <div class="task">
 								<div class="task__info-container">
 									<div class="task__title">
 										<p>Title</p>
@@ -67,7 +68,7 @@
 									<button type="task__button button" class="btn btn-outline-danger"><i
 											class="bi bi-trash3"></i></button>
 								</div>
-							</div>
+							</div> -->
 						</div>
 					</div>
 
@@ -76,34 +77,7 @@
 							<h2 class="board__title">In Progress</h2>
 							<p class="board__task-count">0 tasks</p>
 						</div>
-						<div id="tasksInProgress" class="board__tasks-container">
-							<div class="task">
-								<div class="task__info-container">
-									<div class="task__title">
-										<p>Title</p>
-									</div>
-									<div class="task__description">
-										<p>Lorem ipsum dolor sit amet.</p>
-									</div>
-									<div class="task__date">
-										<p>Date</p>
-									</div>
-									<div class="task__user">
-										<p>User</p>
-									</div>
-								</div>
-								<div class="task__buttons-container">
-									<select class="task__form-select form-select">
-										<option value="1">Low</option>
-										<option value="2">Medium</option>
-										<option value="3">High</option>
-									</select>
-									<button type="task__button button" class="btn btn-outline-primary">Edit</button>
-									<button type="task__button button" class="btn btn-outline-danger"><i
-											class="bi bi-trash3"></i></button>
-								</div>
-							</div>
-						</div>
+						<div id="boardInProgress" class="board__tasks-container"></div>
 					</div>
 
 					<div class="board board__completed">
@@ -111,38 +85,80 @@
 							<h2 class="board__title">Completed</h2>
 							<p class="board__task-count">0 tasks</p>
 						</div>
-						<div id="tasksCompleted" class="board__tasks-container">
-							<div class="task">
-								<div class="task__info-container">
-									<div class="task__title">
-										<p>Title</p>
-									</div>
-									<div class="task__description">
-										<p>Lorem ipsum dolor sit amet.</p>
-									</div>
-									<div class="task__date">
-										<p>Date</p>
-									</div>
-									<div class="task__user">
-										<p>User</p>
-									</div>
+						<div id="boardCompleted" class="board__tasks-container"></div>
+						<div class="boards__footer-container">
+							<button type="button" class="boards__button button btn btn-outline-danger"
+								data-bs-toggle="modal" data-bs-target="#deleteAllModal">Delete all tasks</button>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</section>
+
+		<div class="modals-container">
+			<!-- Modal task -->
+			<div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="addTaskModalLabel">Add Task</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<form id="formAddTask">
+								<div class="mb-3">
+									<label for="taskTitle" class="form-label">Title:</label>
+									<input type="text" name="title" id="taskTitle" class="form-control">
 								</div>
-								<div class="task__buttons-container">
-									<select class="task__form-select form-select">
-										<option value="1">Low</option>
-										<option value="2">Medium</option>
-										<option value="3">High</option>
-									</select>
-									<button type="task__button button" class="btn btn-outline-primary">Edit</button>
-									<button type="task__button button" class="btn btn-outline-danger"><i
-											class="bi bi-trash3"></i></button>
+								<div class="mb-3">
+									<label for="taskDescription" class="form-label">Description:</label>
+									<input type="text" name="description" id="taskDescription" class="form-control">
 								</div>
-							</div>
+								<label for="taskUser" class="form-label">Select user:</label>
+								<select id="selectTaskUser" name="user" class="form-select mb-3">
+									<option value="" selected>Select user</option>
+								</select>
+								<select class="task__form-select form-select" name="priority">
+									<option value="Low" selected>Low</option>
+									<option value="Medium">Medium</option>
+									<option value="High">High</option>
+								</select>
+							</form>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+							<button id="buttonAddTask" type="submit" class="btn btn-primary" form="formAddTask">Add
+								task</button>
 						</div>
 					</div>
 				</div>
 			</div>
-		</section>
+
+			<!-- Modal edit -->
+
+
+			<!-- Modal delete all -->
+			<div class="modal fade" id="deleteAllModal" tabindex="-1" aria-labelledby="deleteAllModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="deleteAllModalLabel">Delete all tasks</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							The data will be deleted permanently. Are you sure you want to delete all tasks?
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Сancel</button>
+							<button type="button" class="btn btn-secondary">Delete all</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</main>
 </body>
 
