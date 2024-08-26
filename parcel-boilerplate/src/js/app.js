@@ -6,16 +6,65 @@ let data = getTasksData()
 const modalAddTaskElement = document.querySelector('#addTaskModal')
 const formAddTaskElement = document.querySelector('#formAddTask')
 const selectUsersElement = document.querySelector('#selectTaskUser')
+const listTaskElement = document.querySelector('#tasksList')
 const boardPlannedElement = document.querySelector('#boardPlanned')
 const boardInProgressElement = document.querySelector('#boardInProgress')
 const boardCompletedElement = document.querySelector('#boardCompleted')
-const buttonDeleteTaskElement = document.querySelector('#buttonDeleteTask')
 const createTaskModal = new Modal(modalAddTaskElement)
 
 
 // Add event listeners
 modalAddTaskElement.addEventListener('submit', handleSubmitForm)
-// buttonDeleteTaskElement.addEventListener('click', handleDeleteTask)
+listTaskElement.addEventListener('click', handleDeleteTask)
+listTaskElement.addEventListener('click', handleEditTask)
+listTaskElement.addEventListener('change', handleChangeTaskStatus)
+
+
+// Handlers
+// при работе с FormData нужен атрибут name - это ключ для передаваемого значения
+// (фигурирует в вёрстке, дублируется в шаблоны и модели)
+function handleSubmitForm(event) {
+	event.preventDefault()
+
+	const { target } = event
+	const formData = new FormData(target)
+	const fromDataEntries = Object.fromEntries(formData.entries())
+
+	const task = new Task(fromDataEntries)
+	data.push(task)
+
+	formAddTaskElement.reset()
+	createTaskModal.hide()
+
+	setTasksData(data)
+	renderTasks(data)
+}
+
+function handleDeleteTask({ target }) {
+	if (target.dataset.role == 'deleteTask') {
+		const targetTask = data.find((task) => task.id === getTaskId({ target }))
+
+		const targetIndexTask = data.indexOf(targetTask)
+		data.splice(targetIndexTask, 1)
+
+		setTasksData(data)
+		renderTasks(getTasksData())
+	}
+}
+
+function handleChangeTaskStatus({ target }) {
+	if (target.dataset.role == 'status') {
+		const targetTask = data.find((task) => task.id === getTaskId({ target }))
+
+		targetTask.status = target.value
+		setTasksData(data)
+		renderTasks(getTasksData())
+	}
+}
+
+function handleEditTask() {
+	console.log('click')
+}
 
 
 // Templates
@@ -50,7 +99,7 @@ function templateTask({ id, title, description, createdAt, user, priority, statu
 				</select>
 				<button id="buttonEditTask" type="button" class="task__button btn btn-outline-primary" data-role="editTask">Edit</button>
 				<button id="buttonDeleteTask" type="button" class="task__button btn btn-outline-danger" data-role="deleteTask"><i
-						class="bi bi-trash3"></i></button>
+						class="bi bi-trash3 pe-none"></i></button>
 			</div>
 		</div>
 	`
@@ -62,6 +111,7 @@ function templateUsers({ name }) {
 	`
 }
 
+
 // Models
 function Task({ title, description, user, priority }) {
 	this.id = crypto.randomUUID()
@@ -71,42 +121,6 @@ function Task({ title, description, user, priority }) {
 	this.user = user
 	this.priority = priority
 	this.status = 'planned'
-}
-
-
-// Handlers
-// при работе с FormData нужен атрибут name - это ключ для передаваемого значения
-// (фигурирует в вёрстке, дублируется в шаблоны и модели)
-function handleSubmitForm(event) {
-	event.preventDefault()
-
-	const { target } = event
-	const formData = new FormData(target)
-	const fromDataEntries = Object.fromEntries(formData.entries())
-
-	const task = new Task(fromDataEntries)
-	data.push(task)
-
-	formAddTaskElement.reset()
-	createTaskModal.hide()
-
-	setTasksData(data)
-	renderTasks(data)
-}
-
-function handleDeleteTask({ target }) {
-	const taskId = target.parentElement.dataset.id
-
-	if (target.dataset.role == 'buttonDeleteTask') {
-		const targetTask = data.find((task) => {
-			task.id === taskId
-		})
-		const targetIndexTask = data.indexOf(targetTask)
-		data.splice(targetIndexTask, 1)
-
-		setTasksData(data)
-		renderTasks(getTasksData())
-	}
 }
 
 
@@ -165,6 +179,12 @@ function getTasksData() {
 function setTasksData(task) {
 	localStorage.setItem('tasks', JSON.stringify(task))
 }
+
+function getTaskId({ target }) {
+	const taskId = target.closest('.task').dataset.id
+	return taskId
+}
+
 
 
 // init
