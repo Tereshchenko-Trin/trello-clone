@@ -15,6 +15,19 @@ h2 {
 	margin: 0;
 }
 
+::-webkit-scrollbar {
+	width: 0.5rem;
+}
+
+::-webkit-scrollbar-thumb {
+	border-radius: 10px;
+	background-color: $gray-300;
+}
+
+::-webkit-scrollbar-track {
+	display: none;
+}
+
 .clock {
 	font-size: 1.5rem;
 	font-weight: 500;
@@ -55,7 +68,6 @@ h2 {
 
 .boards {
 	padding: 1.25rem 0;
-	height: calc(100vh - 5.5625rem);
 
 	&__header-container {
 		margin-bottom: 1.25rem;
@@ -93,6 +105,7 @@ h2 {
 	display: flex;
 	flex-direction: column;
 	gap: 1.25rem;
+	max-height: calc(100vh - 13rem);
 
 	&__title-container {
 		display: flex;
@@ -111,7 +124,19 @@ h2 {
 		display: flex;
 		flex-direction: column;
 		gap: 0.625rem;
+		overflow: hidden;
 	}
+
+	&__tasks-container:hover {
+		overflow: auto;
+	}
+
+	&__in-progress,
+	&__planned,
+	&__completed {
+		height: fit-content;
+	}
+
 }
 
 .task {
@@ -162,14 +187,18 @@ h2 {
 
 @media (max-width: 992px) {
 	html {
-		font-size: 14px;
+		font-size: 15px;
 	}
 }
 
 @media (max-width: 768px) {
 	html {
-		font-size: 12px;
+		font-size: 13px;
 	}
+
+	// body {
+	// 	overflow-x: auto;
+	// }
 }
 
 @media (max-width: 576px) {}

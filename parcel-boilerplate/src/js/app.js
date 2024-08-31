@@ -2,28 +2,45 @@ import { Modal } from 'bootstrap'
 import { getTime } from './_clock'
 
 // Variables
-let data = getTasksData()
+
+// Массив тасок
+let data = getTasksDataFromLocalStorage()
+
+// Объявление модальных окон (бутстраповские)
 const modalAddTaskElement = document.querySelector('#addTaskModal')
+const modalDeleteCompletedTasksElement = document.querySelector('#deleteAllModal')
+const modalWarningMaxTasksElement = document.querySelector('#warningMaxTasks')
+
+// Инициализация бутстраповских методов модальных окон
+const createTaskModal = new Modal(modalAddTaskElement)
+const deleteCompletedTasksModal = new Modal(modalDeleteCompletedTasksElement)
+const warningMaxTasksModal = new Modal(modalWarningMaxTasksElement)
+
+// Объявление элементов статичной вёрстки
 const formAddTaskElement = document.querySelector('#formAddTask')
 const selectUsersElement = document.querySelector('#selectTaskUser')
 const listTaskElement = document.querySelector('#tasksList')
 const boardPlannedElement = document.querySelector('#boardPlanned')
 const boardInProgressElement = document.querySelector('#boardInProgress')
 const boardCompletedElement = document.querySelector('#boardCompleted')
-const createTaskModal = new Modal(modalAddTaskElement)
 
 
-// Add event listeners
+// Event listeners
 modalAddTaskElement.addEventListener('submit', handleSubmitForm)
 listTaskElement.addEventListener('click', handleDeleteTask)
 listTaskElement.addEventListener('click', handleEditTask)
 listTaskElement.addEventListener('change', handleChangeTaskStatus)
+modalDeleteCompletedTasksElement.addEventListener('click', handleDeleteAllCompletedTasks)
 
 
 // Handlers
-// при работе с FormData нужен атрибут name - это ключ для передаваемого значения
-// (фигурирует в вёрстке, дублируется в шаблоны и модели)
 function handleSubmitForm(event) {
+
+	// при работе с FormData важен атрибут name
+	// name - это ключ для передаваемого значения
+	// значение берётся из инпута
+	// (фигурирует в вёрстке, дублируется в шаблоны и конструкторы)
+
 	event.preventDefault()
 
 	const { target } = event
@@ -36,7 +53,7 @@ function handleSubmitForm(event) {
 	formAddTaskElement.reset()
 	createTaskModal.hide()
 
-	setTasksData(data)
+	setTasksDataToLocalStorage(data)
 	renderTasks(data)
 }
 
@@ -47,19 +64,52 @@ function handleDeleteTask({ target }) {
 		const targetIndexTask = data.indexOf(targetTask)
 		data.splice(targetIndexTask, 1)
 
-		setTasksData(data)
-		renderTasks(getTasksData())
+		setTasksDataToLocalStorage(data)
+		renderTasks(getTasksDataFromLocalStorage())
 	}
 }
 
 function handleChangeTaskStatus({ target }) {
-	if (target.dataset.role == 'status') {
+
+	// Меняем статус тасок + проверяем количество тасок "in progress"
+	// Если 6 тасок "in progress" - вызываем модалку-предупреждение
+
+	const inProgressTasks = data.filter((task) => task.status === 'inProgress')
+
+	if (inProgressTasks.length === 6 && target.value === 'inProgress') {
+		warningMaxTasksModal.show()
+	} else if (target.dataset.role === 'status') {
 		const targetTask = data.find((task) => task.id === getTaskId({ target }))
 
 		targetTask.status = target.value
-		setTasksData(data)
-		renderTasks(getTasksData())
+		setTasksDataToLocalStorage(data)
+		renderTasks(getTasksDataFromLocalStorage())
 	}
+}
+
+function handleDeleteAllCompletedTasks({ target }) {
+	let targetTasksId = []
+
+	// Собираем таски для удаления в отдельный массив
+	if (target.dataset.role == 'deleteAllCompletedTasks') {
+		data.forEach((task) => {
+			if (task.status === 'completed') {
+				targetTasksId.push(task.id)
+			}
+		})
+	}
+
+	// Ищем таски из полученного массива в исходном массиве, удаляем
+	for (let id of targetTasksId) {
+		const targetTask = data.find((task) => task.id === id)
+		const targetIndexTask = data.indexOf(targetTask)
+		data.splice(targetIndexTask, 1)
+
+		setTasksDataToLocalStorage(data)
+		renderTasks(getTasksDataFromLocalStorage())
+	}
+
+	deleteCompletedTasksModal.hide()
 }
 
 function handleEditTask() {
@@ -69,6 +119,11 @@ function handleEditTask() {
 
 // Templates
 function templateTask({ id, title, description, createdAt, user, priority, status }) {
+
+	// Данные из формы модалки: title, description, user, priority
+	// Данные создаются динамически: id, createdAt
+	// Данные по дефолту (planned): status
+
 	const date = createdAt.toLocaleString()
 	const plannedAttr = (status === 'planned') ? 'selected' : ''
 	const inProgressAttr = (status === 'inProgress') ? 'selected' : ''
@@ -106,6 +161,10 @@ function templateTask({ id, title, description, createdAt, user, priority, statu
 }
 
 function templateUsers({ name }) {
+
+	// name в value - это данные, которые идут в объект таски
+	// name внутри тега - это данные для отрисовки в селекте юзеров (форма модалки создания таски)
+
 	return `
 		<option value="${name}">${name}</option>
 	`
@@ -141,6 +200,10 @@ function getUsers(url) {
 }
 
 function renderUsers(data) {
+
+	// Вызывается в fetch при положительном response
+	// Отрисовка в селекте юзеров (форма модалки создания таски)
+
 	selectUsersElement.insertAdjacentHTML('beforeend', templateUsers(data))
 }
 
@@ -162,9 +225,25 @@ function renderTasks(data) {
 				break
 		}
 	})
+
+	countTasks(data)
 }
 
-function getTasksData() {
+function countTasks(data) {
+	const counterPlannedTasksElement = document.querySelector('#counterPlanned')
+	const counterInProgressTasksElement = document.querySelector('#counterInProgress')
+	const counterCompletedTasksElement = document.querySelector('#counterCompleted')
+
+	let plannedTasks = data.filter((task) => task.status === 'planned')
+	let inProgressTasks = data.filter((task) => task.status === 'inProgress')
+	let completedTasks = data.filter((task) => task.status === 'completed')
+
+	counterPlannedTasksElement.textContent = `(${plannedTasks.length})`
+	counterInProgressTasksElement.textContent = `(${inProgressTasks.length})`
+	counterCompletedTasksElement.textContent = `(${completedTasks.length})`
+}
+
+function getTasksDataFromLocalStorage() {
 	const tasks = JSON.parse(localStorage.getItem('tasks'))
 
 	if (!tasks) return []
@@ -176,7 +255,7 @@ function getTasksData() {
 	})
 }
 
-function setTasksData(task) {
+function setTasksDataToLocalStorage(task) {
 	localStorage.setItem('tasks', JSON.stringify(task))
 }
 
@@ -184,7 +263,6 @@ function getTaskId({ target }) {
 	const taskId = target.closest('.task').dataset.id
 	return taskId
 }
-
 
 
 // init

@@ -13,7 +13,7 @@
 	<script type="module" src="./js/app.js"></script>
 </head>
 
-<body class="vh-100">
+<body class="vh-100 bg-body-secondary">
 	<header class="header container-fluid">
 		<div class="header__container container">
 			<div class="header__logo">
@@ -27,67 +27,38 @@
 	</header>
 
 	<main>
-		<section class="boards bg-body-secondary">
+		<section class="boards">
 			<div class="boards__container container">
 				<div class="boards__header-container">
 					<h1 class="boards__title">Progect board</h1>
 					<div id="clock" class="clock clock-container"></div>
-					<button type="button" class="boards__button button btn btn-primary" data-bs-toggle="modal"
-						data-bs-target="#addTaskModal">Create Task</button>
+					<button id="buttonCreateTask" type="button" class="boards__button button btn btn-primary"
+						data-bs-toggle="modal" data-bs-target="#addTaskModal">Create Task</button>
 				</div>
 
 				<div id="tasksList" class="boards__workspace-container">
 					<div class="board board__planned">
 						<div class="board__title-container">
-							<h2 class="board__title">Planned</h2>
-							<p class="board__task-count">0 tasks</p>
+							<h2 class="board__title">Planned <span id="counterPlanned"></span></h2>
 						</div>
-						<div id="boardPlanned" class="board__tasks-container">
-							<!-- <div class="task">
-								<div class="task__info-container">
-									<div class="task__title">
-										<p>Title</p>
-									</div>
-									<div class="task__description">
-										<p>Lorem ipsum dolor sit amet.</p>
-									</div>
-									<div class="task__date">
-										<p>Date</p>
-									</div>
-									<div class="task__user">
-										<p>User</p>
-									</div>
-								</div>
-								<div class="task__buttons-container">
-									<select class="task__form-select form-select">
-										<option value="1">Low</option>
-										<option value="2">Medium</option>
-										<option value="3">High</option>
-									</select>
-									<button type="task__button button" class="btn btn-outline-primary">Edit</button>
-									<button type="task__button button" class="btn btn-outline-danger"><i
-											class="bi bi-trash3"></i></button>
-								</div>
-							</div> -->
-						</div>
+						<div id="boardPlanned" class="board__tasks-container"></div>
 					</div>
 
 					<div class="board board__in-progress">
 						<div class="board__title-container">
-							<h2 class="board__title">In Progress</h2>
-							<p class="board__task-count">0 tasks</p>
+							<h2 class="board__title">In Progress <span id="counterInProgress"></span></h2>
 						</div>
 						<div id="boardInProgress" class="board__tasks-container"></div>
 					</div>
 
 					<div class="board board__completed">
 						<div class="board__title-container">
-							<h2 class="board__title">Completed</h2>
-							<p class="board__task-count">0 tasks</p>
+							<h2 class="board__title">Completed <span id="counterCompleted"></span></h2>
 						</div>
 						<div id="boardCompleted" class="board__tasks-container"></div>
 						<button type="button" class="board__button btn btn-outline-danger" data-bs-toggle="modal"
-							data-bs-target="#deleteAllModal">Delete all tasks</button>
+							data-bs-target="#deleteAllModal" data-role="completed">Delete all
+							tasks</button>
 					</div>
 				</div>
 
@@ -95,7 +66,7 @@
 		</section>
 
 		<div class="modals-container">
-			<!-- Modal task -->
+			<!-- Modal create task -->
 			<div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel"
 				aria-hidden="true">
 				<div class="modal-dialog">
@@ -134,10 +105,10 @@
 				</div>
 			</div>
 
-			<!-- Modal edit -->
+			<!-- Modal edit task -->
 
 
-			<!-- Modal delete all -->
+			<!-- Modal-warning: delete all completed tasks -->
 			<div class="modal fade" id="deleteAllModal" tabindex="-1" aria-labelledby="deleteAllModalLabel"
 				aria-hidden="true">
 				<div class="modal-dialog modal-dialog-centered">
@@ -151,7 +122,28 @@
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Сancel</button>
-							<button type="button" class="btn btn-secondary">Delete all</button>
+							<button type="button" class="btn btn-secondary" data-role="deleteAllCompletedTasks">Delete
+								all</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Modal-warning: max tasks in progress -->
+			<div class="modal fade" id="warningMaxTasks" tabindex="-1" aria-labelledby="warningMaxTasksLabel"
+				aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="warningMaxTasksLabel">Warning</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							The maximum number of tasks in progress has already been reached (6)! Please complete the
+							current tasks before adding new ones.
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Ok</button>
 						</div>
 					</div>
 				</div>
