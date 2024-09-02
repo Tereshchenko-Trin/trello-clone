@@ -41,21 +41,22 @@
 						<div class="board__title-container">
 							<h2 class="board__title">Planned <span id="counterPlanned"></span></h2>
 						</div>
-						<div id="boardPlanned" class="board__tasks-container"></div>
+						<div id="boardPlanned" class="board__tasks-container board__tasks-container_planned"></div>
 					</div>
 
 					<div class="board board__in-progress">
 						<div class="board__title-container">
 							<h2 class="board__title">In Progress <span id="counterInProgress"></span></h2>
 						</div>
-						<div id="boardInProgress" class="board__tasks-container"></div>
+						<div id="boardInProgress" class="board__tasks-container board__tasks-container_in-progress">
+						</div>
 					</div>
 
 					<div class="board board__completed">
 						<div class="board__title-container">
 							<h2 class="board__title">Completed <span id="counterCompleted"></span></h2>
 						</div>
-						<div id="boardCompleted" class="board__tasks-container"></div>
+						<div id="boardCompleted" class="board__tasks-container board__tasks-container_completed"></div>
 						<button type="button" class="board__button btn btn-outline-danger" data-bs-toggle="modal"
 							data-bs-target="#deleteAllModal" data-role="completed">Delete all
 							tasks</button>
@@ -72,7 +73,7 @@
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h5 class="modal-title" id="addTaskModalLabel">Add Task</h5>
+							<h5 class="modal-title" id="addTaskModalLabel">Create task</h5>
 							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 						</div>
 						<div class="modal-body">
@@ -85,7 +86,7 @@
 									<label for="taskDescription" class="form-label">Description:</label>
 									<input type="text" name="description" id="taskDescription" class="form-control">
 								</div>
-								<label for="taskUser" class="form-label">Select user:</label>
+								<label for="selectTaskUser" class="form-label">Select user:</label>
 								<select id="selectTaskUser" name="user" class="form-select mb-3">
 									<option value="" selected>Select user</option>
 								</select>
@@ -97,7 +98,7 @@
 							</form>
 						</div>
 						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 							<button id="buttonAddTask" type="submit" class="btn btn-primary" form="formAddTask">Add
 								task</button>
 						</div>
@@ -106,7 +107,50 @@
 			</div>
 
 			<!-- Modal edit task -->
-
+			<div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="editTaskModalLabel">Edit task data</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<form id="formEditTask">
+								<div class="mb-3">
+									<label for="editTaskTitle" class="form-label">Title:</label>
+									<input type="text" name="title" id="editTaskTitle" class="form-control">
+								</div>
+								<div class="mb-3">
+									<label for="editTaskDescription" class="form-label">Description:</label>
+									<input type="text" name="description" id="editTaskDescription" class="form-control">
+								</div>
+								<label for="editSelectTaskUser" class="form-label">Select user:</label>
+								<select id="editSelectTaskUser" name="user" class="form-select mb-3">
+									<option value="" selected>Select user</option>
+								</select>
+								<select class="task__form-select form-select" name="priority"
+									id="editSelectTaskPriority">
+									<option value="Low" selected>Low</option>
+									<option value="Medium">Medium</option>
+									<option value="High">High</option>
+								</select>
+								<!-- Скрытые инпуты, значение которых сохранится при изменении таски -->
+								<div>
+									<input type="hidden" name="id" id="editTaskId">
+									<input type="hidden" name="createdAt" id="editTaskCreatedAt">
+									<input type="hidden" name="status" id="editTaskStatus">
+								</div>
+							</form>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+							<button id="buttonAddTask" type="submit" class="btn btn-primary" form="formEditTask">Save
+								changes</button>
+						</div>
+					</div>
+				</div>
+			</div>
 
 			<!-- Modal-warning: delete all completed tasks -->
 			<div class="modal fade" id="deleteAllModal" tabindex="-1" aria-labelledby="deleteAllModalLabel"

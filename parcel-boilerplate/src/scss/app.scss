@@ -127,6 +127,10 @@ h2 {
 		overflow: hidden;
 	}
 
+	// &__tasks-container_planned~div {
+	// 	background-color: rgb(6, 56, 39);
+	// }
+
 	&__tasks-container:hover {
 		overflow: auto;
 	}
@@ -143,6 +147,7 @@ h2 {
 	border: 1px, solid, $gray-300;
 	border-radius: 10px;
 	padding: 0.625rem;
+	cursor: pointer;
 
 	&__info-container {
 		display: flex;

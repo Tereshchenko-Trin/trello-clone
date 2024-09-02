@@ -8,17 +8,21 @@ let data = getTasksDataFromLocalStorage()
 
 // Объявление модальных окон (бутстраповские)
 const modalAddTaskElement = document.querySelector('#addTaskModal')
+const modalEditTaskElement = document.querySelector('#editTaskModal')
 const modalDeleteCompletedTasksElement = document.querySelector('#deleteAllModal')
 const modalWarningMaxTasksElement = document.querySelector('#warningMaxTasks')
 
-// Инициализация бутстраповских методов модальных окон
-const createTaskModal = new Modal(modalAddTaskElement)
+// Инициализация бутстраповских модальных окон, для работы с методами 
+const addTaskModal = new Modal(modalAddTaskElement)
+const editTaskModal = new Modal(modalEditTaskElement)
 const deleteCompletedTasksModal = new Modal(modalDeleteCompletedTasksElement)
 const warningMaxTasksModal = new Modal(modalWarningMaxTasksElement)
 
 // Объявление элементов статичной вёрстки
 const formAddTaskElement = document.querySelector('#formAddTask')
+const formEditTaskElement = document.querySelector('#formEditTask')
 const selectUsersElement = document.querySelector('#selectTaskUser')
+const editSelectUsersElement = document.querySelector('#editSelectTaskUser')
 const listTaskElement = document.querySelector('#tasksList')
 const boardPlannedElement = document.querySelector('#boardPlanned')
 const boardInProgressElement = document.querySelector('#boardInProgress')
@@ -26,20 +30,21 @@ const boardCompletedElement = document.querySelector('#boardCompleted')
 
 
 // Event listeners
-modalAddTaskElement.addEventListener('submit', handleSubmitForm)
-listTaskElement.addEventListener('click', handleDeleteTask)
-listTaskElement.addEventListener('click', handleEditTask)
-listTaskElement.addEventListener('change', handleChangeTaskStatus)
-modalDeleteCompletedTasksElement.addEventListener('click', handleDeleteAllCompletedTasks)
+modalAddTaskElement.addEventListener('submit', handleSubmitAddForm)
+modalEditTaskElement.addEventListener('submit', handleSubmitEditForm)
+modalDeleteCompletedTasksElement.addEventListener('click', handleClickButtonDeleteAll)
+listTaskElement.addEventListener('click', handleClickButtonDelete)
+listTaskElement.addEventListener('click', handleClickButtonEdit)
+listTaskElement.addEventListener('change', handleChangeSelectStatus)
 
 
 // Handlers
-function handleSubmitForm(event) {
+function handleSubmitAddForm(event) {
 
 	// при работе с FormData важен атрибут name
-	// name - это ключ для передаваемого значения
-	// значение берётся из инпута
-	// (фигурирует в вёрстке, дублируется в шаблоны и конструкторы)
+	// name - это ключ для передаваемого значения (значение берётся из инпута)
+	// name фигурирует в вёрстке, переменными дублируется в шаблоны и конструкторы
+	// в данном случае данные объекта FormData передаются в конструктор Task
 
 	event.preventDefault()
 
@@ -51,16 +56,61 @@ function handleSubmitForm(event) {
 	data.push(task)
 
 	formAddTaskElement.reset()
-	createTaskModal.hide()
+	addTaskModal.hide()
 
 	setTasksDataToLocalStorage(data)
 	renderTasks(data)
 }
 
-function handleDeleteTask({ target }) {
-	if (target.dataset.role == 'deleteTask') {
+function handleClickButtonEdit({ target }) {
+
+	// Ищем изменяемую таску, передаём её данные в инпуты формы (модалка изменения таски)
+
+	if (target.dataset.role === 'editTask') {
 		const targetTask = data.find((task) => task.id === getTaskId({ target }))
 
+		// Данные для изменения, видимые пользователю
+		document.querySelector('#editTaskTitle').value = targetTask.title
+		document.querySelector('#editTaskDescription').value = targetTask.description
+		document.querySelector('#editSelectTaskUser').value = targetTask.user
+		document.querySelector('#editSelectTaskPriority').value = targetTask.priority
+
+		// Данные для сохранения, скрытые от пользователя
+		document.querySelector('#editTaskId').value = targetTask.id
+		document.querySelector('#editTaskCreatedAt').value = targetTask.createdAt.toLocaleString()
+		document.querySelector('#editTaskStatus').value = targetTask.status
+
+		editTaskModal.show()
+	}
+}
+
+function handleSubmitEditForm(event) {
+
+	// Через сохранённый в FormData Id ищем изменяемую таску и заменяем её
+
+	event.preventDefault()
+
+	const { target } = event
+	const formData = new FormData(target)
+	const fromDataEntries = Object.fromEntries(formData.entries())
+
+	const editedTask = data.find((task) => task.id === fromDataEntries.id)
+	const editedIndexTask = data.indexOf(editedTask)
+	data.splice(editedIndexTask, 1, fromDataEntries)
+
+	formEditTaskElement.reset()
+	editTaskModal.hide()
+
+	setTasksDataToLocalStorage(data)
+	renderTasks(data)
+}
+
+function handleClickButtonDelete({ target }) {
+
+	// Ищем нужную таску и вырезаем её
+
+	if (target.dataset.role == 'deleteTask') {
+		const targetTask = data.find((task) => task.id === getTaskId({ target }))
 		const targetIndexTask = data.indexOf(targetTask)
 		data.splice(targetIndexTask, 1)
 
@@ -69,10 +119,10 @@ function handleDeleteTask({ target }) {
 	}
 }
 
-function handleChangeTaskStatus({ target }) {
+function handleChangeSelectStatus({ target }) {
 
-	// Меняем статус тасок + проверяем количество тасок "in progress"
-	// Если 6 тасок "in progress" - вызываем модалку-предупреждение
+	// Первым if проверяем количество тасок "in progress" (если 6 - вызываем модалку-предупреждение)
+	// Вторым if ищем нужную таску, меняем её статус
 
 	const inProgressTasks = data.filter((task) => task.status === 'inProgress')
 
@@ -82,12 +132,13 @@ function handleChangeTaskStatus({ target }) {
 		const targetTask = data.find((task) => task.id === getTaskId({ target }))
 
 		targetTask.status = target.value
+
 		setTasksDataToLocalStorage(data)
 		renderTasks(getTasksDataFromLocalStorage())
 	}
 }
 
-function handleDeleteAllCompletedTasks({ target }) {
+function handleClickButtonDeleteAll({ target }) {
 	let targetTasksId = []
 
 	// Собираем таски для удаления в отдельный массив
@@ -99,7 +150,7 @@ function handleDeleteAllCompletedTasks({ target }) {
 		})
 	}
 
-	// Ищем таски из полученного массива в исходном массиве, удаляем
+	// Ищем таски из полученного массива в исходном массиве, вырезаем совпадения
 	for (let id of targetTasksId) {
 		const targetTask = data.find((task) => task.id === id)
 		const targetIndexTask = data.indexOf(targetTask)
@@ -110,10 +161,6 @@ function handleDeleteAllCompletedTasks({ target }) {
 	}
 
 	deleteCompletedTasksModal.hide()
-}
-
-function handleEditTask() {
-	console.log('click')
 }
 
 
@@ -163,7 +210,7 @@ function templateTask({ id, title, description, createdAt, user, priority, statu
 function templateUsers({ name }) {
 
 	// name в value - это данные, которые идут в объект таски
-	// name внутри тега - это данные для отрисовки в селекте юзеров (форма модалки создания таски)
+	// name внутри тега - это данные для отрисовки в селекте юзеров (форма модалки создания и изменения таски)
 
 	return `
 		<option value="${name}">${name}</option>
@@ -202,9 +249,10 @@ function getUsers(url) {
 function renderUsers(data) {
 
 	// Вызывается в fetch при положительном response
-	// Отрисовка в селекте юзеров (форма модалки создания таски)
+	// Отрисовка в селекте юзеров (форма модалки создания и изменения таски)
 
 	selectUsersElement.insertAdjacentHTML('beforeend', templateUsers(data))
+	editSelectUsersElement.insertAdjacentHTML('beforeend', templateUsers(data))
 }
 
 function renderTasks(data) {
