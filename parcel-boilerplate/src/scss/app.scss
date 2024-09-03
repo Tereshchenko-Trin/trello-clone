@@ -11,8 +11,13 @@
 }
 
 p,
+h1,
 h2 {
 	margin: 0;
+}
+
+.button {
+	border-radius: 50px;
 }
 
 ::-webkit-scrollbar {
@@ -29,7 +34,7 @@ h2 {
 }
 
 .clock {
-	font-size: 1.5rem;
+	font-size: 1.25rem;
 	font-weight: 500;
 }
 
@@ -45,7 +50,7 @@ h2 {
 	}
 
 	&__logo {
-		max-width: 8rem;
+		max-width: 7.5rem;
 		width: 100%;
 	}
 
@@ -62,28 +67,25 @@ h2 {
 	}
 }
 
-.button {
-	border-radius: 50px;
-}
-
 .boards {
-	padding: 1.25rem 0;
+	padding: 1rem 0;
 
 	&__header-container {
-		margin-bottom: 1.25rem;
 		display: flex;
 		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 1rem;
 	}
 
 	&__title {
-		font-size: 1.875rem;
+		font-size: 1.25rem;
 	}
 
 	&__workspace-container {
 		display: flex;
 		justify-content: space-between;
 		gap: 1.25rem;
-		margin-bottom: 1.25rem;
+		margin-bottom: 1rem;
 	}
 
 	&__button {
@@ -97,15 +99,16 @@ h2 {
 }
 
 .board {
+	position: relative;
 	max-width: 25rem;
 	width: 100%;
-	padding: 1.25rem;
-	border-radius: 10px;
-	background-color: $white;
+	max-height: calc(100vh - 12rem);
 	display: flex;
 	flex-direction: column;
-	gap: 1.25rem;
-	max-height: calc(100vh - 13rem);
+	gap: 1rem;
+	padding: 1rem;
+	border-radius: 10px;
+	background-color: $white;
 
 	&__title-container {
 		display: flex;
@@ -113,7 +116,7 @@ h2 {
 	}
 
 	&__title {
-		font-size: 1.5rem;
+		font-size: 1.125rem;
 	}
 
 	&__task-count {
@@ -127,12 +130,20 @@ h2 {
 		overflow: hidden;
 	}
 
-	// &__tasks-container_planned~div {
-	// 	background-color: rgb(6, 56, 39);
-	// }
-
 	&__tasks-container:hover {
 		overflow: auto;
+	}
+
+	&__tasks-container_planned>.task {
+		box-shadow: inset 3px 0px 0px 0px #2aa126;
+	}
+
+	&__tasks-container_in-progress>.task {
+		box-shadow: inset 3px 0px 0px 0px #fada4e;
+	}
+
+	&__tasks-container_completed>.task {
+		box-shadow: inset 3px 0px 0px 0px #446cda;
 	}
 
 	&__in-progress,
@@ -140,13 +151,12 @@ h2 {
 	&__completed {
 		height: fit-content;
 	}
-
 }
 
 .task {
 	border: 1px, solid, $gray-300;
 	border-radius: 10px;
-	padding: 0.625rem;
+	padding: 1rem;
 	cursor: pointer;
 
 	&__info-container {
@@ -156,10 +166,15 @@ h2 {
 		margin-bottom: 1rem;
 	}
 
-	&__title {
+	&__title-container {
 		display: flex;
 		justify-content: space-between;
+		align-items: center;
 		gap: 0.625rem;
+	}
+
+	&__title {
+		font-size: 1rem;
 	}
 
 	&__description {
@@ -179,11 +194,10 @@ h2 {
 	}
 
 	&__priority {
-		max-width: 20rem;
-		width: 100%;
 		border: 1px, solid, $gray-300;
 		border-radius: 10px;
-		padding: 0.625rem;
+		font-size: 0.875rem;
+		padding: 0.3125rem 0.625rem;
 	}
 }
 

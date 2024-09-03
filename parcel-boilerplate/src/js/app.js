@@ -1,10 +1,128 @@
 import { Modal } from 'bootstrap'
 import { getTime } from './_clock'
 
+// Class
+class Task {
+	id = crypto.randomUUID()
+	createdAt = new Date()
+	status = 'planned'
+
+	constructor({ title, description, user, priority }) {
+		this.title = title
+		this.description = description
+		this.user = user
+		this.priority = priority
+	}
+
+	static templateTask({ id, title, description, createdAt, user, priority, status }) {
+
+		// Данные из формы модалки: title, description, user, priority
+		// Данные создаются динамически: id, createdAt
+		// Данные по дефолту (planned): status
+
+		const date = createdAt.toLocaleString()
+		const plannedAttr = (status === 'planned') ? 'selected' : ''
+		const inProgressAttr = (status === 'inProgress') ? 'selected' : ''
+		const completedAttr = (status === 'completed') ? 'selected' : ''
+
+		return `
+			<div class="task" data-id=${id}>
+				<div class="task__info-container">
+					<div class="task__title-container">
+						<div class="task__title"><p>${title}</p></div>
+						<div class="task__priority"><p>${priority}</p></div>
+					</div>
+					<div class="task__description">
+						<p>${description}</p>
+					</div>
+					<div class="task__date">
+						<p>${date}</p>
+					</div>
+					<div class="task__user">
+						<p>${user}</p>
+					</div>
+				</div>
+				<div class="task__buttons-container">
+					<select class="task__board-select form-select" name="status" data-role="status">
+						<option value="planned" ${plannedAttr}>Plapped</option>
+						<option value="inProgress" ${inProgressAttr}>In Progress</option>
+						<option value="completed" ${completedAttr}>Completed</option>
+					</select>
+					<button id="buttonEditTask" type="button" class="task__button btn btn-outline-primary" data-role="editTask">Edit</button>
+					<button id="buttonDeleteTask" type="button" class="task__button btn btn-outline-danger" data-role="deleteTask"><i
+							class="bi bi-trash3 pe-none"></i></button>
+				</div>
+			</div>
+		`
+	}
+
+	static getTasksDataFromLocalStorage() {
+		const tasks = JSON.parse(localStorage.getItem('tasks'))
+
+		if (!tasks) return []
+
+		return tasks.map((task) => {
+			task.createdAt = new Date(task.createdAt)
+
+			return task
+		})
+	}
+
+	static setTasksDataToLocalStorage(task) {
+		localStorage.setItem('tasks', JSON.stringify(task))
+	}
+
+	static renderTasks(data) {
+		const boardPlannedElement = document.querySelector('#boardPlanned')
+		const boardInProgressElement = document.querySelector('#boardInProgress')
+		const boardCompletedElement = document.querySelector('#boardCompleted')
+
+		boardPlannedElement.innerHTML = ''
+		boardInProgressElement.innerHTML = ''
+		boardCompletedElement.innerHTML = ''
+
+		data.forEach((task) => {
+			switch (task.status) {
+				case 'planned':
+					boardPlannedElement.insertAdjacentHTML('afterbegin', this.templateTask(task))
+					break
+				case 'inProgress':
+					boardInProgressElement.insertAdjacentHTML('afterbegin', this.templateTask(task))
+					break
+				case 'completed':
+					boardCompletedElement.insertAdjacentHTML('afterbegin', this.templateTask(task))
+					break
+			}
+		})
+
+		this.countTasks(data)
+	}
+
+	static countTasks(data) {
+		const counterPlannedTasksElement = document.querySelector('#counterPlanned')
+		const counterInProgressTasksElement = document.querySelector('#counterInProgress')
+		const counterCompletedTasksElement = document.querySelector('#counterCompleted')
+
+		let plannedTasks = data.filter((task) => task.status === 'planned')
+		let inProgressTasks = data.filter((task) => task.status === 'inProgress')
+		let completedTasks = data.filter((task) => task.status === 'completed')
+
+		counterPlannedTasksElement.textContent = `(${plannedTasks.length})`
+		counterInProgressTasksElement.textContent = `(${inProgressTasks.length})`
+		counterCompletedTasksElement.textContent = `(${completedTasks.length})`
+	}
+
+	static getTaskId({ target }) {
+		const taskId = target.closest('.task').dataset.id
+		return taskId
+	}
+}
+
+
 // Variables
 
 // Массив тасок
-let data = getTasksDataFromLocalStorage()
+let data = Task.getTasksDataFromLocalStorage()
 
 // Объявление модальных окон (бутстраповские)
 const modalAddTaskElement = document.querySelector('#addTaskModal')
@@ -21,12 +139,8 @@ const warningMaxTasksModal = new Modal(modalWarningMaxTasksElement)
 // Объявление элементов статичной вёрстки
 const formAddTaskElement = document.querySelector('#formAddTask')
 const formEditTaskElement = document.querySelector('#formEditTask')
-const selectUsersElement = document.querySelector('#selectTaskUser')
-const editSelectUsersElement = document.querySelector('#editSelectTaskUser')
 const listTaskElement = document.querySelector('#tasksList')
-const boardPlannedElement = document.querySelector('#boardPlanned')
-const boardInProgressElement = document.querySelector('#boardInProgress')
-const boardCompletedElement = document.querySelector('#boardCompleted')
+
 
 
 // Event listeners
@@ -58,8 +172,8 @@ function handleSubmitAddForm(event) {
 	formAddTaskElement.reset()
 	addTaskModal.hide()
 
-	setTasksDataToLocalStorage(data)
-	renderTasks(data)
+	Task.setTasksDataToLocalStorage(data)
+	Task.renderTasks(data)
 }
 
 function handleClickButtonEdit({ target }) {
@@ -67,7 +181,7 @@ function handleClickButtonEdit({ target }) {
 	// Ищем изменяемую таску, передаём её данные в инпуты формы (модалка изменения таски)
 
 	if (target.dataset.role === 'editTask') {
-		const targetTask = data.find((task) => task.id === getTaskId({ target }))
+		const targetTask = data.find((task) => task.id === Task.getTaskId({ target }))
 
 		// Данные для изменения, видимые пользователю
 		document.querySelector('#editTaskTitle').value = targetTask.title
@@ -101,8 +215,8 @@ function handleSubmitEditForm(event) {
 	formEditTaskElement.reset()
 	editTaskModal.hide()
 
-	setTasksDataToLocalStorage(data)
-	renderTasks(data)
+	Task.setTasksDataToLocalStorage(data)
+	Task.renderTasks(data)
 }
 
 function handleClickButtonDelete({ target }) {
@@ -110,12 +224,12 @@ function handleClickButtonDelete({ target }) {
 	// Ищем нужную таску и вырезаем её
 
 	if (target.dataset.role == 'deleteTask') {
-		const targetTask = data.find((task) => task.id === getTaskId({ target }))
+		const targetTask = data.find((task) => task.id === Task.getTaskId({ target }))
 		const targetIndexTask = data.indexOf(targetTask)
 		data.splice(targetIndexTask, 1)
 
-		setTasksDataToLocalStorage(data)
-		renderTasks(getTasksDataFromLocalStorage())
+		Task.setTasksDataToLocalStorage(data)
+		Task.renderTasks(Task.getTasksDataFromLocalStorage())
 	}
 }
 
@@ -129,12 +243,12 @@ function handleChangeSelectStatus({ target }) {
 	if (inProgressTasks.length === 6 && target.value === 'inProgress') {
 		warningMaxTasksModal.show()
 	} else if (target.dataset.role === 'status') {
-		const targetTask = data.find((task) => task.id === getTaskId({ target }))
+		const targetTask = data.find((task) => task.id === Task.getTaskId({ target }))
 
 		targetTask.status = target.value
 
-		setTasksDataToLocalStorage(data)
-		renderTasks(getTasksDataFromLocalStorage())
+		Task.setTasksDataToLocalStorage(data)
+		Task.renderTasks(Task.getTasksDataFromLocalStorage())
 	}
 }
 
@@ -156,8 +270,8 @@ function handleClickButtonDeleteAll({ target }) {
 		const targetIndexTask = data.indexOf(targetTask)
 		data.splice(targetIndexTask, 1)
 
-		setTasksDataToLocalStorage(data)
-		renderTasks(getTasksDataFromLocalStorage())
+		Task.setTasksDataToLocalStorage(data)
+		Task.renderTasks(Task.getTasksDataFromLocalStorage())
 	}
 
 	deleteCompletedTasksModal.hide()
@@ -165,155 +279,49 @@ function handleClickButtonDeleteAll({ target }) {
 
 
 // Templates
-function templateTask({ id, title, description, createdAt, user, priority, status }) {
 
-	// Данные из формы модалки: title, description, user, priority
-	// Данные создаются динамически: id, createdAt
-	// Данные по дефолту (planned): status
+class Users {
 
-	const date = createdAt.toLocaleString()
-	const plannedAttr = (status === 'planned') ? 'selected' : ''
-	const inProgressAttr = (status === 'inProgress') ? 'selected' : ''
-	const completedAttr = (status === 'completed') ? 'selected' : ''
+	static templateUsers({ name }) {
 
-	return `
-		<div class="task" data-id=${id}>
-			<div class="task__info-container">
-				<div class="task__title">
-					<p>${title}</p>
-					<p>${priority}</p>
-				</div>
-				<div class="task__description">
-					<p>${description}</p>
-				</div>
-				<div class="task__date">
-					<p>${date}</p>
-				</div>
-				<div class="task__user">
-					<p>${user}</p>
-				</div>
-			</div>
-			<div class="task__buttons-container">
-				<select class="task__board-select form-select" name="status" data-role="status">
-					<option value="planned" ${plannedAttr}>Plapped</option>
-					<option value="inProgress" ${inProgressAttr}>In Progress</option>
-					<option value="completed" ${completedAttr}>Completed</option>
-				</select>
-				<button id="buttonEditTask" type="button" class="task__button btn btn-outline-primary" data-role="editTask">Edit</button>
-				<button id="buttonDeleteTask" type="button" class="task__button btn btn-outline-danger" data-role="deleteTask"><i
-						class="bi bi-trash3 pe-none"></i></button>
-			</div>
-		</div>
-	`
-}
+		// name в value - это данные, которые идут в объект таски
+		// name внутри тега - это данные для отрисовки в селекте юзеров (форма модалки создания и изменения таски)
 
-function templateUsers({ name }) {
+		return `
+			<option value="${name}">${name}</option>
+		`
+	}
 
-	// name в value - это данные, которые идут в объект таски
-	// name внутри тега - это данные для отрисовки в селекте юзеров (форма модалки создания и изменения таски)
+	static getUsers(url) {
+		fetch(url)
+			.then((response) => {
+				if (!response.ok) throw new Error(response.status)
 
-	return `
-		<option value="${name}">${name}</option>
-	`
-}
+				return response.json()
+			})
+			.then((data) => {
+				data.forEach((item) => this.renderUsers(item))
+			})
+			.catch((error) => {
+				alert(`${error}`)
+			})
+	}
 
+	static renderUsers(data) {
 
-// Models
-function Task({ title, description, user, priority }) {
-	this.id = crypto.randomUUID()
-	this.title = title
-	this.description = description
-	this.createdAt = new Date()
-	this.user = user
-	this.priority = priority
-	this.status = 'planned'
-}
+		// Вызывается в fetch при положительном response
+		// Отрисовка в селекте юзеров (форма модалки создания и изменения таски)
 
+		const selectUsersElement = document.querySelector('#selectTaskUser')
+		const editSelectUsersElement = document.querySelector('#editSelectTaskUser')
 
-// Helpers
-function getUsers(url) {
-	fetch(url)
-		.then((response) => {
-			if (!response.ok) throw new Error(response.status)
-
-			return response.json()
-		})
-		.then((data) => {
-			data.forEach((item) => renderUsers(item))
-		})
-		.catch((error) => {
-			alert(`${error}`)
-		})
-}
-
-function renderUsers(data) {
-
-	// Вызывается в fetch при положительном response
-	// Отрисовка в селекте юзеров (форма модалки создания и изменения таски)
-
-	selectUsersElement.insertAdjacentHTML('beforeend', templateUsers(data))
-	editSelectUsersElement.insertAdjacentHTML('beforeend', templateUsers(data))
-}
-
-function renderTasks(data) {
-	boardPlannedElement.innerHTML = ''
-	boardInProgressElement.innerHTML = ''
-	boardCompletedElement.innerHTML = ''
-
-	data.forEach((task) => {
-		switch (task.status) {
-			case 'planned':
-				boardPlannedElement.insertAdjacentHTML('afterbegin', templateTask(task))
-				break
-			case 'inProgress':
-				boardInProgressElement.insertAdjacentHTML('afterbegin', templateTask(task))
-				break
-			case 'completed':
-				boardCompletedElement.insertAdjacentHTML('afterbegin', templateTask(task))
-				break
-		}
-	})
-
-	countTasks(data)
-}
-
-function countTasks(data) {
-	const counterPlannedTasksElement = document.querySelector('#counterPlanned')
-	const counterInProgressTasksElement = document.querySelector('#counterInProgress')
-	const counterCompletedTasksElement = document.querySelector('#counterCompleted')
-
-	let plannedTasks = data.filter((task) => task.status === 'planned')
-	let inProgressTasks = data.filter((task) => task.status === 'inProgress')
-	let completedTasks = data.filter((task) => task.status === 'completed')
-
-	counterPlannedTasksElement.textContent = `(${plannedTasks.length})`
-	counterInProgressTasksElement.textContent = `(${inProgressTasks.length})`
-	counterCompletedTasksElement.textContent = `(${completedTasks.length})`
-}
-
-function getTasksDataFromLocalStorage() {
-	const tasks = JSON.parse(localStorage.getItem('tasks'))
-
-	if (!tasks) return []
-
-	return tasks.map((task) => {
-		task.createdAt = new Date(task.createdAt)
-
-		return task
-	})
-}
-
-function setTasksDataToLocalStorage(task) {
-	localStorage.setItem('tasks', JSON.stringify(task))
-}
-
-function getTaskId({ target }) {
-	const taskId = target.closest('.task').dataset.id
-	return taskId
+		selectUsersElement.insertAdjacentHTML('beforeend', this.templateUsers(data))
+		editSelectUsersElement.insertAdjacentHTML('beforeend', this.templateUsers(data))
+	}
 }
 
 
 // init
-getUsers('https://jsonplaceholder.typicode.com/users')
-renderTasks(data)
+Users.getUsers('https://jsonplaceholder.typicode.com/users')
+Task.renderTasks(data)
 setInterval(getTime, 1000)
