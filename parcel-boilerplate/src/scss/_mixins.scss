@@ -1,0 +1,23 @@
+@mixin border-radius-50 {
+	border-radius: 50px;
+}
+
+@mixin border-radius-10 {
+	border-radius: 10px;
+}
+
+@mixin title-text {
+	font-size: 1.25rem;
+}
+
+@mixin regular-text {
+	font-size: 0.875rem;
+}
+
+@mixin block-gap {
+	gap: 1.25rem;
+}
+
+@mixin element-gap {
+	gap: 0.625rem;
+}

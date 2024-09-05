@@ -16,11 +16,11 @@
 <body class="vh-100 bg-body-secondary">
 	<header class="header container-fluid">
 		<div class="header__container container">
-			<div class="header__logo">
+			<div class="header__logo" id="logo">
 				<img src="./img/logo-icon.svg" alt="logo" class="img-fluid">
 			</div>
-			<form class="header__input-container">
-				<input class="header__search-input form-control" type="search" placeholder="Search">
+			<form class="header__input-container" id="formSearch">
+				<input class="header__search-input form-control" name="searchValue" type="search" placeholder="Search">
 				<button class="header__button btn btn-outline-primary" type="submit">Search</button>
 			</form>
 		</div>
@@ -31,7 +31,7 @@
 			<div class="boards__container container">
 				<div class="boards__header-container">
 					<h1 class="boards__title">Progect board</h1>
-					<div id="clock" class="clock clock-container"></div>
+					<div id="clock" class="clock clock-container">00:00:00</div>
 					<button id="buttonCreateTask" type="button" class="boards__button button btn btn-primary"
 						data-bs-toggle="modal" data-bs-target="#addTaskModal">Create Task</button>
 				</div>
@@ -41,7 +41,8 @@
 						<div class="board__title-container">
 							<h2 class="board__title">Planned <span id="counterPlanned"></span></h2>
 						</div>
-						<div id="boardPlanned" class="board__tasks-container board__tasks-container_planned"></div>
+						<div id="boardPlanned" class="board__tasks-container board__tasks-container_planned">
+						</div>
 					</div>
 
 					<div class="board board__in-progress">
@@ -157,14 +158,14 @@
 				aria-hidden="true">
 				<div class="modal-dialog modal-dialog-centered">
 					<div class="modal-content">
-						<div class="modal-header">
-							<h5 class="modal-title" id="deleteAllModalLabel">Delete all tasks</h5>
+						<div class="modal-header mb-3">
 							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 						</div>
-						<div class="modal-body">
-							The data will be deleted permanently. Are you sure you want to delete all tasks?
+						<h5 class="modal-title mx-auto fw-bold" id="deleteAllModalLabel">Warning!</h5>
+						<div class="modal-body text-center mx-auto" style="width: 350px;">
+							The data will be deleted permanently. Do you really want to delete all tasks?
 						</div>
-						<div class="modal-footer">
+						<div class="modal-footer mx-auto">
 							<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Сancel</button>
 							<button type="button" class="btn btn-secondary" data-role="deleteAllCompletedTasks">Delete
 								all</button>
