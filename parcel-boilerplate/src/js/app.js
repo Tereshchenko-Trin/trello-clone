@@ -131,7 +131,11 @@ function onChangeSelectStatus({ target }) {
 
 	if (inProgressTasks.length === 6 && target.value === 'inProgress') {
 		warningMaxTasksModal.show()
+
 	} else if (target.dataset.role === 'status') {
+		if (inProgressTasks.length === 6 && target.value === 'inProgress') {
+			warningMaxTasksModal.show()
+		}
 		const targetTask = data.find((task) => task.id === Task.getId({ target }))
 
 		targetTask.status = target.value
